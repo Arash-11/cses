@@ -5,10 +5,11 @@ using namespace std;
 using llu = unsigned long long int;
 
 int main() {
-    int n;
+    llu n;
     cin >> n;
 
-    llu sum = n*(n + 1) / 2;
+    // explicitly modify where the division by 2 is done to avoid overflow
+    llu sum = n % 2 == 0 ? (n / 2) * (n + 1) : n * ((n + 1) / 2);
 
     if (sum % 2 != 0) {
         cout << "NO" << "\n";
@@ -17,31 +18,28 @@ int main() {
 
     cout << "YES" << "\n";
 
-    vector<int> first_set;
-    vector<int> second_set;
-    llu counter = sum / 2;
-
-    first_set.push_back(n);
-    counter -= n;
-    for (llu i = n - 1; counter > 0; i--) {
-        if (i > counter) continue;
-        first_set.push_back(i);
-        counter -= i;
+    vector<llu> first_set;
+    llu i = sum / 2;
+    llu last = n;
+    while (last > 0) {
+        first_set.push_back(last);
+        i = i - last;
+        last = i >= last ? last - 1 : i;
     }
 
     int first_set_size = first_set.size();
 
     cout << first_set_size << "\n";
-    for (auto it = first_set.rbegin(); it != first_set.rend(); it++) {
-        cout << *it << " ";
+    for (auto i : first_set) {
+        cout << i << " ";
     }
     cout << "\n";
 
     cout << n - first_set_size << "\n";
-    first_set_size--; // index now
-    for (int i = 1; i <= n; i++) {
-        if (first_set[first_set_size] == i) {
-            first_set_size--;
+    int idx = first_set_size - 1;
+    for (llu i = 1; i <= n; i++) {
+        if (first_set[idx] == i) {
+            idx--;
             continue;
         }
         cout << i << " ";
